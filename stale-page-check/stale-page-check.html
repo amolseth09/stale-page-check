@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Stale Page Check</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="data:," />
+    <link rel="stylesheet" href="/tools/stale-page-check/stale-page-check.css" />
+    <!-- Import DA App SDK: gives us an authenticated token via postMessage
+         with da.live, instead of requiring a manually-pasted token. Only
+         works when this page is opened through the da.live app URL. -->
+    <script src="https://da.live/nx/utils/sdk.js" type="module"></script>
+  </head>
+  <body>
+    <main>
+      <h1>Stale Page Check</h1>
+      <p class="intro">
+        Finds pages that are live on the production site but no longer exist in da.live —
+        deleted, renamed, or otherwise missed during publishing. Review the list, select the
+        ones that are genuinely stale, then unpublish them.
+      </p>
+
+      <p class="sdk-note" id="sdk-note">
+        Checking for an authenticated da.live session…
+      </p>
+
+      <section class="config">
+        <label>
+          Org
+          <input id="cfg-org" type="text" value="example-org" />
+        </label>
+        <label>
+          Repo
+          <input id="cfg-repo" type="text" value="example-site" />
+        </label>
+        <label>
+          Branch
+          <input id="cfg-branch" type="text" value="main" />
+        </label>
+        <label>
+          Live index URL
+          <input id="cfg-index" type="text" value="https://www.example.com/full-index.json" />
+        </label>
+        <label>
+          da.live auth token <span class="hint">(optional fallback — auto-filled from your da.live session when opened via the da.live app URL)</span>
+          <input id="cfg-da-token" type="password" placeholder="auto-filled, or paste one manually" />
+        </label>
+        <label>
+          admin.hlx.page auth token <span class="hint">(optional — leave blank to try the logged-in session first)</span>
+          <input id="cfg-hlx-token" type="password" placeholder="paste X-Auth-Token, if needed" />
+        </label>
+      </section>
+
+      <div class="actions">
+        <button id="scan-btn" type="button">Scan for stale pages</button>
+        <span id="scan-status" class="status"></span>
+      </div>
+
+      <p id="scan-warning" class="scan-warning" hidden></p>
+
+      <section id="results-section" hidden>
+        <div class="results-header">
+          <label class="select-all">
+            <input id="select-all" type="checkbox" />
+            Select all
+          </label>
+          <span id="results-count"></span>
+          <button id="delete-btn" type="button" disabled>Unpublish selected</button>
+        </div>
+        <table id="results-table">
+          <thead>
+            <tr>
+              <th></th>
+              <th>Path</th>
+              <th>Live URL</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="results-body"></tbody>
+        </table>
+      </section>
+
+      <section id="manual-section">
+        <h2>Unpublish paths manually</h2>
+        <p class="manual-help">
+          Missed a page, or left it unchecked above? Paste one or more paths (or full live URLs),
+          separated by commas or new lines. Preview and live are both removed. The homepage
+          (<code>/</code>) is not accepted.
+        </p>
+        <textarea id="manual-paths" rows="3" placeholder="/en/products/old-page, /en/news/2019/some-article"></textarea>
+        <label class="manual-option">
+          <input id="manual-delete-da" type="checkbox" />
+          Also delete from da.live if it exists <span class="hint">(removes the source document; needs the da.live token)</span>
+        </label>
+        <div class="actions">
+          <button id="manual-btn" type="button">Unpublish these paths</button>
+          <span id="manual-note" class="status"></span>
+        </div>
+        <table id="manual-table" hidden>
+          <thead>
+            <tr>
+              <th>Path</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="manual-body"></tbody>
+        </table>
+      </section>
+
+      <section id="log-section">
+        <h2>Log</h2>
+        <pre id="log"></pre>
+      </section>
+    </main>
+
+    <script src="/tools/stale-page-check/stale-page-check.js" type="module"></script>
+  </body>
+</html>
